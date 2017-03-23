@@ -66,20 +66,55 @@ public class Afd {
         //hola
     }
 
+    public static Stack<Integer> sort(Stack<Integer> s) {//ordenar pilas enteras de mayor a menor
+
+        if (s.isEmpty()) {
+            return s;
+        }
+        int pivot = s.pop();
+
+        // partition
+        Stack<Integer> left = new Stack<>();
+        Stack<Integer> right = new Stack<>();
+        while (!s.isEmpty()) {
+            int y = s.pop();
+            if (y < pivot) {
+                left.push(y);
+            } else {
+                right.push(y);
+            }
+        }
+        sort(left);
+        sort(right);
+
+        // merge
+        Stack<Integer> tmp = new Stack<>();
+        while (!right.isEmpty()) {
+            tmp.push(right.pop());
+        }
+        tmp.push(pivot);
+        while (!left.isEmpty()) {
+            tmp.push(left.pop());
+        }
+        while (!tmp.isEmpty()) {
+            s.push(tmp.pop());
+        }
+        return s;
+    }
+
     public void recorrer() {
         System.out.println("------------------So------------------");
         Estado So = new Estado();
         HacerCerradura(raiz, So);
-
-//        So.Mueve("f", 0);
+        So.eps = sort(So.eps);//Ordenando
         So.imprimirCerradura();
         So.imprimirMueve();
 
         System.out.println("------------------S1------------------");
         Estado S1 = new Estado();
-        HacerCerradura(So.lstMueve.get(0).listNumeros.pop(), S1);
-        HacerCerradura(So.lstMueve.get(0).listNumeros.pop(), S1);
-
+        HacerCerradura(So.lstMueve.get(0).listNum.pop(), S1);
+        HacerCerradura(So.lstMueve.get(0).listNum.pop(), S1);
+        S1.eps = sort(S1.eps);//Ordenando
         S1.imprimirCerradura();
         S1.imprimirMueve();
     }
@@ -131,17 +166,16 @@ public class Afd {
     }
 
     public class Estado {
-
         Stack<Integer> eps = new Stack<>();
         ArrayList<Mueve> lstMueve = new ArrayList<>();
 
         public void insertarEpsilon(int numero) {
             Iterator< Integer> iterador = eps.iterator();
-            boolean busqueda=false;//para no ingresar número repetidos
+            boolean busqueda = false;//para no ingresar número repetidos
             while (iterador.hasNext()) {
                 Integer a = iterador.next();
-                if (a==numero) {
-                    busqueda=true;
+                if (a == numero) {
+                    busqueda = true;
                 }
             }
             if (!busqueda) {
@@ -155,7 +189,8 @@ public class Afd {
             if (lstMueve.isEmpty()) {//se inicializa la lista
                 Mueve muv = new Mueve();
                 muv.transicion = transicion;
-                muv.listNumeros.add(nod);//agregando el sub-árbol a los mueve
+//                muv.listNumeros.add(nod);
+                muv.insert(nod);//agregando el sub-árbol a los mueve
                 lstMueve.add(muv);
             } else {
                 Iterator< Mueve> iterador = lstMueve.iterator();
@@ -165,7 +200,8 @@ public class Afd {
 
                         Mueve muv = new Mueve();
                         muv.transicion = transicion;
-                        muv.listNumeros.add(nod);//se agrega el nodo-arbol a la lista del mueve
+//                        muv.listNumeros.add(nod);
+                        muv.insert(nod);//se agrega el nodo-arbol a la lista del mueve
                         lstMueve.add(muv);
                         break;
                     } else {
@@ -182,7 +218,7 @@ public class Afd {
             while (iterador.hasNext()) {
                 Mueve elemento = iterador.next();
                 if (elemento.transicion.equals(transicion)) {//lo encontró, aquí debe de ingresarlo
-                    elemento.listNumeros.add(nod);
+                    elemento.insert(nod);
                     //  elemento.listNumeros.push(numero);
                     //  lstMueve.get(i).list.add(numero);//debe de insertar en la lstMueve
                     retorno = true;
@@ -208,19 +244,6 @@ public class Afd {
             }
             System.out.println(cadena);
         }
-        /*
-        public void mueve(String transicion) {
-            while (!cerradura.cerradura.isEmpty()) {
-                if (cerradura.transición.equals(transicion)) {
-                    //ya esta en la lista
-                }else{
-                    Transicion transi=new Transicion();
-                    transi.ltrTransicion=transicion;
-                    cerradura.cerradura.add(pila)
-                }
-            }
-
-        }*/
     }
 
     public class Mueve {
@@ -228,11 +251,11 @@ public class Afd {
         String transicion;
 
         //ArrayList<Integer> listNumeros = new ArrayList<>();
-        Stack<Metodos.Nodo> listNumeros = new Stack<>();
+        Stack<Metodos.Nodo> listNum = new Stack<>();
 
         public String imprimir() {
             String retorno = " ->";
-            Iterator<Metodos.Nodo> iterador = listNumeros.iterator();
+            Iterator<Metodos.Nodo> iterador = listNum.iterator();
 
             while (iterador.hasNext()) {
                 retorno = retorno + " | " + iterador.next().id;
@@ -240,8 +263,19 @@ public class Afd {
             return retorno;
         }
 
-        public void insertarNumEnMueve(Metodos.Nodo nodo) {
-            listNumeros.add(nodo);
+        public void insert(Metodos.Nodo nodoNuevo) {
+            Iterator<Metodos.Nodo> iterador = listNum.iterator();
+            boolean busqueda = false;//para no ingresar número repetidos
+            while (iterador.hasNext()) {
+                Integer a = iterador.next().id;
+                if (a == nodoNuevo.id) {
+                    busqueda = true;
+                }
+            }
+            if (!busqueda) {
+                listNum.push(nodoNuevo);
+            }
+
         }
     }
 
