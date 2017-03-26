@@ -36,7 +36,8 @@ public class MetdoThompson {
 
 //        System.out.println(Variables.graph.cadenaGraphivz);
         Afd afd = new Afd(Variables.graph.pila.pop());
-        afd.recorrer();
+        afd.recorrer2();
+//        afd.metodoPrueba();
 //        afd.recorrerPila();
 //afd.anchura();
 
