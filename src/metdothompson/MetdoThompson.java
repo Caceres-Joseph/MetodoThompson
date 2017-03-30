@@ -6,6 +6,7 @@
 package metdothompson;
 
 import java.io.StringReader;
+import metdothompson.Afd.Estado;
 import metdothompson.Metodos.Nodo;
 
 /**
@@ -26,22 +27,24 @@ public class MetdoThompson {
 //        String cadena=".|.|ab|cd.ef|.gh|.ijk";
         //String cadena=".?|zw*||.ab.cd|.wx.ef";
 //        String cadena="|+|a|e|i|ou+|p|q|r|st";
-        String cadena = ".*|b.*baa";
+//        String cadena = ".*|*a+b|*a*b";//fallla douglas
+        String cadena="||..a*b.|.afc*|.|.ebd.*.ab|.afc.ef.*.cd.|a.ce*|.|b.fd.*.cd|a.ce.fe.*c.|.a.*|acb.b.|bca*|a|bc";//christian
 //      String cadena="|.|.|ab|.|cdef|o|i.gh|jk.|kj|||.hgio.|f.e|dc|ba";
-
+//        String cadena = ".*|b.*baa";
 //        String cadena = ".b|j+d";
 //        String  cadena = "||ab|cd";
         new Sintactico(new Scanner(new StringReader(cadena))).parse();
-        //System.out.println(Variables.graph.cadenaGraphivz);
-
+        System.out.println("--------------------AFN----------------");
+        System.out.println(Variables.graph.cadenaGraphivz);
+        System.out.println("-----------AFD----------------------");
 //        System.out.println(Variables.graph.cadenaGraphivz);
+
         Afd afd = new Afd(Variables.graph.pila.pop());
+
         afd.recorrer2();
 //        afd.metodoPrueba();
 //        afd.recorrerPila();
 //afd.anchura();
-
-
 //        Metodos graph =new Metodos();
 //        graph.saludar();
 //        String lal= "hola";

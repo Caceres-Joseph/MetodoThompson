@@ -43,6 +43,23 @@ public class Afd {
         }
     }
 
+    public void LimpiarEnAnchura() {
+        Metodos.Nodo aux;
+        if (raiz != null) {
+            cola.add(raiz);//insertando la cabeza
+            while (!cola.isEmpty()) {
+                aux = cola.poll();
+                aux.usada = false;
+                if (!(aux.izdo == null)) {
+                    cola.add(aux.izdo);
+                }
+                if (!(aux.dcho == null)) {
+                    cola.add(aux.dcho);
+                }
+            }
+        }
+    }
+
     public Metodos.Nodo buscar(int busq) {//recorre todo el árbol en búsca del nuevo nodo
         Queue<Metodos.Nodo> cola1 = new LinkedList<>();
         Metodos.Nodo retorno = null;
@@ -128,7 +145,8 @@ public class Afd {
         Estado estadoPrueba = new Estado();
         while (itNodo.hasNext()) {//lista de subarboles
             Metodos.Nodo nod = itNodo.next();
-            HacerCerradura(nod, estadoPrueba);
+            HacerCerraduraChafa(nod, estadoPrueba);
+            LimpiarEnAnchura();
 //            HacerCerradura(nod, est);
         }
         estadoPrueba.eps = sort(estadoPrueba.eps);
@@ -137,9 +155,9 @@ public class Afd {
             boolean loEncontro = false;
             Iterator<Cerradura> iter = listaCerraduras.iterator();
             while (iter.hasNext()) {
-                Cerradura cer=iter.next();
+                Cerradura cer = iter.next();
                 Stack<Integer> temp = cer.num;
-                
+
 //                System.out.print(Arrays.toString(temp.toArray()));
 //                System.out.println(Arrays.toString(estadoPrueba.eps.toArray()));
                 if (compareStacks(temp, estadoPrueba.eps)) {
@@ -153,7 +171,7 @@ public class Afd {
 //                }
             }
             if (loEncontro) {
-                
+
                 retorno = null;
 
 //                System.out.println("si esta en la lista de cerraduras");
@@ -171,12 +189,20 @@ public class Afd {
         return retorno;
     }
 
+    public void recorrer3() {
+
+    }
+
     public void recorrer2() {
         Estado So = new Estado();
         So.nombre = "S0";
-        HacerCerradura(raiz, So);
-        So.eps = sort(So.eps);
+        HacerCerraduraChafa(raiz, So);
+        So.eps = sort(So.eps); //ordena
+        LimpiarEnAnchura();
+
+//      So.imprimirCerradura();
         recorrerTrue(So);
+        imprimirCerraduras();
         /*Stack<Integer> num1=new Stack<>();
         Stack<Integer> num2=new Stack<>();
         num1.push(1);
@@ -195,48 +221,59 @@ public class Afd {
     }
 // Stack<Estado> pilaEstados = new Stack<>();
 //    public ArrayList<Stack<Integer>> listaCerraduras = new ArrayList<>();
-    public ArrayList<Cerradura> listaCerraduras=new ArrayList<>();
+    public ArrayList<Cerradura> listaCerraduras = new ArrayList<>();
 
     int contadorDeEstados = 1;
+
+    public void imprimirCerraduras() {
+        System.out.println("------------------Cerraduras---------------");
+        Iterator<Cerradura> it = listaCerraduras.iterator();
+        while (it.hasNext()) {
+            Cerradura cer = it.next();
+            System.out.println(cer.estado + "->" + Arrays.toString(cer.num.toArray()));
+        }
+    }
 
     public void recorrerTrue(Estado estdo) {//este estado ya tiene que venir con cerraduras
 //       HacerCerradura(sub_arbol, estdo);
 //        estdo.imprimirCerradura();
-        Cerradura cerr=new Cerradura();
-        cerr.estado=estdo.nombre;
-        cerr.num= estdo.eps;
+        Cerradura cerr = new Cerradura();
+        cerr.estado = estdo.nombre;
+        cerr.num = estdo.eps;
         listaCerraduras.add(cerr);
-        
-        System.out.println(estdo.nombre + "->" + Arrays.toString(estdo.eps.toArray()));
-        
+
+        // System.out.println(estdo.nombre + "->" + Arrays.toString(estdo.eps.toArray()));
         Iterator<Mueve> itMuv = estdo.lstMueve.iterator(); //recorriendo los mueve, para hacer mas estados, o cerraduras
         while (itMuv.hasNext()) {//aquí creo los estados nuevos//primer mueve
-            Mueve muv = itMuv.next();
-            Estado estd = retornoEstado(muv);
+            Mueve muv = itMuv.next();//avanzo con cada mueve
+            Estado estd = retornoEstado(muv);//el nuevo estado
+//            LimpiarEnAnchura();
             if (estd != null) {//vuelve a recorrer el estado
                 Iterator<Metodos.Nodo> itNodo = muv.listNum.iterator();//recorriendo los nodos del muevee
+                //aquí limpio
                 while (itNodo.hasNext()) {
                     Metodos.Nodo nod = itNodo.next();
-                    HacerCerradura(nod, estd);
+
+                    HacerCerraduraChafa(nod, estd);
                     estd.eps = sort(estd.eps);
                 }
+                LimpiarEnAnchura();
                 contadorDeEstados++;//incrementamos el contador de esatados;
 
 //                System.out.println(muv.imprimir());
-
                 recorrerTrue(estd);
                 //lista de estados con cerradura
 
             }
 //            System.out.println("-----------------------");
-            String dot="";
-            dot="\""+estdo.nombre+"\" -> "+muv.imprimir();
+            String dot = "";
+            dot = "\"" + estdo.nombre + "\" -> " + muv.imprimir();
 //            System.out.print(estdo.nombre+" -> ");
 //            System.out.println(muv.imprimir());
             System.out.println(dot);
-           // S1 -> S0 [label="a"];
+//            
+            // S1 -> S0 [label="a"];
         }
-
     }
 
     public void recorrer() {
@@ -412,9 +449,67 @@ list.add(1);
         }
     }
 
+    public void HacerCerraduraChafa(Metodos.Nodo nodo, Estado estado) {
+        Metodos.Nodo aux;
+        if (nodo != null) {
+            Queue<Metodos.Nodo> cola = new LinkedList<>();
+            cola.add(nodo);//insertando la cabeza a una coola
+            int contador = 0;
+            while (!cola.isEmpty()) {//recorre en anchura
+                aux = cola.poll();//saca de la cola
+                estado.insertarEpsilon(aux.id);//lo meto a la pila de epsilon del estado
+
+                if (aux.izdo == null && aux.dcho == null && aux.usada == false) {//este nodo es el último
+                    aux.usada = true;//bandera para no volver a recorrerlo
+                    Metodos.Nodo temporal = buscar(aux.id);//hace la búsqueda
+
+                    if (temporal == null) {//no lo encontró
+//                        System.out.println("no lo encontró -> " + aux.id);
+                    } else if (temporal.transicion.equals("e")) {
+                        String cadena = "";
+                        if (temporal.izdo != null && temporal.dcho != null) {
+                            cadena = temporal.id + "-->izdo-" + temporal.izdo.transicion + "|" + temporal.izdo.id + "-dcho-" + temporal.dcho.transicion + "|" + temporal.dcho.id;
+                        } else if (temporal.izdo != null && temporal.dcho == null) {
+                            cadena = temporal.id + "-->izdo-" + temporal.izdo.transicion + "|" + temporal.izdo.id;
+
+                        } else if (temporal.izdo == null && temporal.dcho != null) {
+                            cadena = temporal.id + "-->dcho-" + temporal.dcho.transicion + "|" + temporal.dcho.id;
+
+                        } else if (temporal.izdo == null && temporal.dcho == null) {
+                            cadena = temporal.id + "-->los dos nulos";
+                        }
+//                        System.out.println(cadena);
+                        HacerCerraduraChafa(temporal, estado);
+
+                    }
+//                    aux.usada = false;
+                } else {
+                    if (!(aux.izdo == null)) {//para las hojas izquierdas
+                        if (aux.izdo.transicion.equals("e")) {
+                            cola.add(aux.izdo);
+                        } else {
+                            estado.Mueve(aux.izdo.transicion, aux.izdo);//ingresando a los mueve del estado en nodo completo
+//                            System.out.println(aux.izdo.transicion + " | " + aux.izdo.id);
+                        }
+                    }
+                    if (!(aux.dcho == null)) {//para las hojas derechas
+                        if (aux.dcho.transicion.equals("e")) {
+                            cola.add(aux.dcho);
+                        } else {
+                            estado.Mueve(aux.dcho.transicion, aux.dcho);//enviando todo el nodo
+//                            System.out.println(aux.dcho.transicion + " | " + aux.dcho.id);
+                            //lo ingreso a una lista
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public class Cerradura {
+
         String estado;
-        Stack<Integer> num=new Stack<>();
+        Stack<Integer> num = new Stack<>();
     }
 
     public class Estado {
@@ -482,6 +577,15 @@ list.add(1);
             return retorno;
         }
 
+        public void imprimirMueve1() {//se puede borrar
+
+            Iterator<Mueve> iterador = lstMueve.iterator();
+            while (iterador.hasNext()) {
+                Mueve elemento = iterador.next();
+                System.out.println(elemento.imprimir1());
+            }
+        }
+
         public void imprimirMueve() {
 
             Iterator<Mueve> iterador = lstMueve.iterator();
@@ -492,7 +596,7 @@ list.add(1);
         }
 
         public void imprimirCerradura() {
-            String cadena = "epsilon -> ";
+            String cadena = nombre + " -> ";
             while (!eps.isEmpty()) {
                 cadena = cadena + "|" + eps.pop();
             }
@@ -510,19 +614,34 @@ list.add(1);
 
         public String imprimir() {
 //            String retorno = "\"" + transicion + "\" -> " + estado ;
-            String retorno="\"" +estado+"\""+ "[label ="+"\""+transicion+"\"];";
+            String retorno = "\"" + estado + "\"" + "[label =" + "\"" + transicion + "\"];";
             //S1 -> S0 [label="a"];
             //String retorno = transicion + "|" + estado + " -> ";
             Iterator<Metodos.Nodo> iterador = listNum.iterator();
 
             while (iterador.hasNext()) {
 //                retorno = retorno + " | " + iterador.next().id;
-iterador.next();
+                iterador.next();
+            }
+            return retorno;
+        }
+
+        public String imprimir1() {//se puede eliminar
+//            String retorno = "\"" + transicion + "\" -> " + estado ;
+//            String retorno = "\"" + estado + "\"" + "[label =" + "\"" + transicion + "\"];";
+            //S1 -> S0 [label="a"];
+            String retorno = transicion + " -> ";
+            Iterator<Metodos.Nodo> iterador = listNum.iterator();
+
+            while (iterador.hasNext()) {
+                retorno = retorno + " | " + iterador.next().id;
+                iterador.next();
             }
             return retorno;
         }
 
         public void insert(Metodos.Nodo nodoNuevo) {
+
             Iterator<Metodos.Nodo> iterador = listNum.iterator();
             boolean busqueda = false;//para no ingresar número repetidos
             while (iterador.hasNext()) {
