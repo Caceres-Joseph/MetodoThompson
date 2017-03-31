@@ -202,7 +202,10 @@ public class Afd {
 
 //      So.imprimirCerradura();
         recorrerTrue(So);
-        imprimirCerraduras();
+//        imprimirCerraduras();
+
+        estadosDeAceptacion();
+//        listaDeEstados1();
         /*Stack<Integer> num1=new Stack<>();
         Stack<Integer> num2=new Stack<>();
         num1.push(1);
@@ -234,6 +237,138 @@ public class Afd {
         }
     }
 
+    public int elMasGrande() {
+        int retorno = 0;
+
+        Iterator<Cerradura> it = listaCerraduras.iterator();
+        while (it.hasNext()) {
+            Cerradura cer = it.next();
+            Iterator<Integer> itNum = cer.num.iterator();
+            while (itNum.hasNext()) {
+                int num = itNum.next();
+                if (num > retorno) {
+                    retorno = num;
+                }
+            }
+        }
+        return retorno;
+    }
+    ArrayList<String> listaDeEstadosDeAceptacion = new ArrayList<>();
+
+    public boolean esEstadoDeAceptacion(String estado) {
+        boolean retorno = false;
+        if (listaDeEstadosDeAceptacion.isEmpty()) {
+             estadosDeAceptacion();//llenando la lista de estados de aceptacion
+        }
+        Iterator<String> it = listaDeEstadosDeAceptacion.iterator();
+        while (it.hasNext()) {
+            String dato = it.next();
+            if (dato.equals(estado)) {
+                retorno = true;
+                break;
+            }
+        }
+        return retorno;
+    }
+
+    public void estadosDeAceptacion() {
+        System.out.println("-------------------Estados de Aceptacion-------------------");
+        int ultimoNumero = elMasGrande();
+        String estadosDeAceptacion = "";
+        Iterator<Cerradura> it = listaCerraduras.iterator();
+        while (it.hasNext()) {//recorriendo lista de cerraduras
+            Cerradura cer = it.next();
+//            System.out.println(cer.estado + "->" + Arrays.toString(cer.num.toArray()));
+            Iterator<Integer> itNum = cer.num.iterator();
+            boolean esDeAceptacion = false;
+            while (itNum.hasNext()) {
+                int num = itNum.next();
+                if (num == ultimoNumero) {
+                    esDeAceptacion = true;
+                }
+            }
+            if (esDeAceptacion) {
+                listaDeEstadosDeAceptacion.add(cer.estado);
+                estadosDeAceptacion = estadosDeAceptacion + "|" + cer.estado;
+            }
+
+        }
+        System.out.println(estadosDeAceptacion);
+    }
+    ArrayList<Estado> listaDeEstados = new ArrayList<>();
+
+    public boolean evaluarCadena(String cadena) {
+        Stack<Estado> pilaEstado = new Stack<>();
+        pilaEstado.push(BuscarEstado("S0"));//inicio con el primer estado
+        boolean retorno = false;
+        boolean bandera2=true;
+        for (int i = 0; i < cadena.length(); i++) {
+            System.out.println("Caracter " + i + ": " + cadena.charAt(i));
+            Estado est = pilaEstado.pop();
+            Boolean bandera = false;
+            Iterator<Mueve> it = est.lstMueve.iterator();
+
+            while (it.hasNext()) {
+                Mueve muv = it.next();
+
+                if (muv.transicion.equals(String.valueOf(cadena.charAt(i)))) {//encontro la transicion
+                    System.out.println(est.nombre + "-->" + muv.transicion + "--->" + muv.estado);
+                    pilaEstado.push(BuscarEstado(muv.estado));
+                    bandera = true;
+                    break;
+                }
+            }
+            if (!bandera) {
+                bandera2=false;
+                pilaEstado.push(est);
+                System.out.println("no lo encontro");
+            }
+
+        }
+        
+        if (esEstadoDeAceptacion(pilaEstado.pop().nombre)&&bandera2) {
+            retorno=true;
+        }
+        
+        return retorno;
+    }
+
+    public Estado BuscarEstado(String estadoABuscar) {
+        Iterator<Estado> it = listaDeEstados.iterator();
+        Estado retorno = null;
+        while (it.hasNext()) {
+            Estado est = it.next();
+            if (estadoABuscar.equals(est.nombre)) {
+                retorno = est;
+                break;
+            }
+
+        }
+        return retorno;
+    }
+
+    public void listaDeEstados1() {
+        Iterator<Estado> it = listaDeEstados.iterator();
+        while (it.hasNext()) {
+            Estado est = it.next();
+//            System.out.println("-> "+est.nombre);
+            Iterator<Mueve> itMu = est.lstMueve.iterator();
+            while (itMu.hasNext()) {
+                Mueve muv = itMu.next();
+//                String cadena="";
+                System.out.println(est.nombre + "-->" + muv.transicion + "--->" + muv.estado);
+
+//                Iterator<Metodos.Nodo> itNum=muv.listNum.iterator();
+//                
+//                while (itNum.hasNext()) {                    
+//                    Metodos.Nodo nod= itNum.next();
+//                    cadena=cadena+","+nod.id;
+//                }
+//                 System.out.println(cadena);
+            }
+        }
+    }
+
     public void recorrerTrue(Estado estdo) {//este estado ya tiene que venir con cerraduras
 //       HacerCerradura(sub_arbol, estdo);
 //        estdo.imprimirCerradura();
@@ -241,7 +376,7 @@ public class Afd {
         cerr.estado = estdo.nombre;
         cerr.num = estdo.eps;
         listaCerraduras.add(cerr);
-
+        listaDeEstados.add(estdo);
         // System.out.println(estdo.nombre + "->" + Arrays.toString(estdo.eps.toArray()));
         Iterator<Mueve> itMuv = estdo.lstMueve.iterator(); //recorriendo los mueve, para hacer mas estados, o cerraduras
         while (itMuv.hasNext()) {//aquí creo los estados nuevos//primer mueve
@@ -268,6 +403,7 @@ public class Afd {
 //            System.out.println("-----------------------");
             String dot = "";
             dot = "\"" + estdo.nombre + "\" -> " + muv.imprimir();
+//            listaDeEstados.add(estd);//agrego a la lista de estados
 //            System.out.print(estdo.nombre+" -> ");
 //            System.out.println(muv.imprimir());
             System.out.println(dot);
@@ -454,7 +590,6 @@ list.add(1);
         if (nodo != null) {
             Queue<Metodos.Nodo> cola = new LinkedList<>();
             cola.add(nodo);//insertando la cabeza a una coola
-            int contador = 0;
             while (!cola.isEmpty()) {//recorre en anchura
                 aux = cola.poll();//saca de la cola
                 estado.insertarEpsilon(aux.id);//lo meto a la pila de epsilon del estado

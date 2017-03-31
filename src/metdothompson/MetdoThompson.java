@@ -22,17 +22,23 @@ public class MetdoThompson {
     public static void main(String[] args) throws Exception {
         // TODO code application logic here
 //        String  cadena = ".e*|e|dg";
-//        String cadena=".+|?a+b|c+d";//falla
+        String cadena=".+|?a+b|c+d";//falla
         // String cadena="?.+|?ab|+jd";//falla
 //        String cadena=".|.|ab|cd.ef|.gh|.ijk";
         //String cadena=".?|zw*||.ab.cd|.wx.ef";
 //        String cadena="|+|a|e|i|ou+|p|q|r|st";
 //        String cadena = ".*|*a+b|*a*b";//fallla douglas
-        String cadena="||..a*b.|.afc*|.|.ebd.*.ab|.afc.ef.*.cd.|a.ce*|.|b.fd.*.cd|a.ce.fe.*c.|.a.*|acb.b.|bca*|a|bc";//christian
+//        String cadena="||..a*b.|.afc*|.|.ebd.*.ab|.afc.ef.*.cd.|a.ce*|.|b.fd.*.cd|a.ce.fe.*c.|.a.*|acb.b.|bca*|a|bc";//christian
 //      String cadena="|.|.|ab|.|cdef|o|i.gh|jk.|kj|||.hgio.|f.e|dc|ba";
 //        String cadena = ".*|b.*baa";
 //        String cadena = ".b|j+d";
 //        String  cadena = "||ab|cd";
+//String cadena="|..a*b.|.afc*|.|.ebd.*.ab|.afc.ef.*.cd.|a.ce*|.|b.fd.*.cd|a.ce.fe"//Christian2;
+//String cadena="..a*b.|.afc*|.|.zbd.*.ab|.afc.zf";//Christian3;
+//String cadena="..a*b.|.afc*|g.zf"; 
+//|..a*b.|.afc*|.|.ebd.*.ab|.afc.ef.*.cd.|a.ce*|.|b.fd.*.cd|a.ce.fe
+//String cadena="|..a*b.|.afc*|.|.zbd.*.ab|.afc.zf.*.cd.|a.cz*|.|b.fd.*.cd|a.cz.fz";
+//STri cadena="|..a*b.|.afc*|.|.zbd.*.ab|.afc.zf.*.cd.|a.cz*|.|b.fd.*.cd|a.cz.fz"
         new Sintactico(new Scanner(new StringReader(cadena))).parse();
         System.out.println("--------------------AFN----------------");
         System.out.println(Variables.graph.cadenaGraphivz);
@@ -42,6 +48,8 @@ public class MetdoThompson {
         Afd afd = new Afd(Variables.graph.pila.pop());
 
         afd.recorrer2();
+        System.out.println("---------------Recorriendo-------------");
+        System.out.println(afd.evaluarCadena("aabbbbcdda"));
 //        afd.metodoPrueba();
 //        afd.recorrerPila();
 //afd.anchura();

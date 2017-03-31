@@ -211,6 +211,27 @@ public class Metodos {
         return listaNodos;
     }
 
+    public ArrayList<Nodo> And_3(int inicial, String b, ArrayList<Nodo> list) {
+        ArrayList<Nodo> listaNodos = new ArrayList<>();
+
+        Nodo cabezaOr;
+
+        Nodo nodo2 = list.get(0);
+        nodo2.transicion=b;
+        Nodo nodo3 = list.get(1);
+        Nodo nodo1 = new Nodo(inicial, null);
+
+        cabezaOr = nodo1;
+        nodo1.izdo=nodo2;
+        
+        graf(nodo1, nodo2);
+
+        listaNodos.add(cabezaOr);
+        listaNodos.add(nodo3);
+
+        return listaNodos;
+    }
+
     public ArrayList<Nodo> And_2(int inicial, ArrayList<Nodo> list_a, ArrayList<Nodo> list_b) {
         ArrayList<Nodo> listaNodos = new ArrayList<>();
 
@@ -347,8 +368,8 @@ public class Metodos {
 //    ArrayList<Metodos.Nodo> listaB;
 //    ArrayList<Metodos.Nodo> listaC;
     ArrayList<Metodos.Nodo> temporal;
-    Stack<ArrayList<Nodo>> pila=new Stack<ArrayList<Nodo>>();
-    
+    Stack<ArrayList<Nodo>> pila = new Stack<ArrayList<Nodo>>();
+
     public void hacerGrafo(String token_a, String token_b, String operacion) {
 
         String primer_a = token_a.substring(0, 1);
@@ -365,13 +386,14 @@ public class Metodos {
                     pila.push(temporal);
                     indice = temporal.get(1).id + 1;
                 } else if (!primer_a.equals("(") && primer_b.equals("(")) {
-                    temporal = And_1(indice, pila.pop(), token_a);
+//                    temporal = And_1(indice, pila.pop(), token_a);
+                    temporal = And_3(indice,  token_a,pila.pop());
                     pila.push(temporal);
                     indice = temporal.get(1).id + 1;
                 } else if (primer_a.equals("(") && primer_b.equals("(")) {
-                    ArrayList<Metodos.Nodo> primero=pila.pop();
-                    ArrayList<Metodos.Nodo> segundo=pila.pop();
-                    
+                    ArrayList<Metodos.Nodo> primero = pila.pop();
+                    ArrayList<Metodos.Nodo> segundo = pila.pop();
+
                     temporal = And_2(indice, segundo,primero);
                     pila.push(temporal);
                     indice = temporal.get(1).id + 1;
@@ -404,7 +426,7 @@ public class Metodos {
                 } else if (primer_a.equals("(")) {
                     temporal = Aster_1(indice, pila.pop());
 //                    Limpiar();
-                   pila.push(temporal);
+                    pila.push(temporal);
                     indice = temporal.get(1).id + 1;
                 }
                 break;
@@ -414,7 +436,7 @@ public class Metodos {
                     pila.push(temporal);
                     indice = temporal.get(1).id + 1;
                 } else if (primer_a.equals("(")) {
-                    temporal = Interrog_1(indice,pila.pop());
+                    temporal = Interrog_1(indice, pila.pop());
                     pila.push(temporal);
                     indice = temporal.get(1).id + 1;
                 }
@@ -434,6 +456,7 @@ public class Metodos {
                 break;
         }
     }
+
     /*
      public void hacerGrafo45(String token_a, String token_b, String operacion) {
 
@@ -614,7 +637,7 @@ public class Metodos {
         }
         return retorno;
     }
-*/
+     */
 
     public class Nodo {
 
@@ -623,7 +646,7 @@ public class Metodos {
         public Nodo dcho;
         public Nodo izdo;
         public boolean usada;
-        
+
         public Nodo(int id, String transicion) {
             this.id = id;
             this.transicion = transicion;
